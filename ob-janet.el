@@ -4,7 +4,7 @@
 ;; Author: Your Name <your.email@example.com>
 ;; Keywords: org, babel, literate programming, janet
 ;; URL: https://github.com/YOUR_USERNAME/ob-janet
-;; Version: 1.0.2
+;; Version: 1.0.3
 ;; Package-Requires: ((emacs "25.1") (org "9.1"))
 
 ;; This file is not part of GNU Emacs.
@@ -125,14 +125,14 @@ This function is called by `org-babel-execute-src-block'."
     (if session
         ;; Session-based execution
         (let* ((buffer (org-babel-janet-initiate-session session))
-               ;; Use the robust `org-babel-comint-with-output' macro. It is
-               ;; more widely available than `org-babel-comint-eval-in-repl'.
-               ;; It returns a list of results; for a single evaluation,
-               ;; we take the first element with `car'.
+               ;; Use the robust `org-babel-comint-with-output' macro.
+               ;; The first argument to this macro must be a list containing
+               ;; the buffer and an optional end-of-output indicator.
+               ;; We pass `(list buffer nil)` so the macro uses the
+               ;; buffer-local `comint-prompt-regexp` we've set.
                (comint-results
                 (car
-                 (org-babel-comint-with-output buffer
-                   nil ; Use the buffer-local comint-prompt-regexp
+                 (org-babel-comint-with-output (list buffer nil)
                    (insert full-body)
                    (comint-send-input nil t)))))
           (org-babel-result-cond (cdr (assq :result-params params))
