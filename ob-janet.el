@@ -4,7 +4,7 @@
 ;; Author: Your Name <your.email@example.com>
 ;; Keywords: org, babel, literate programming, janet
 ;; URL: https://github.com/YOUR_USERNAME/ob-janet
-;; Version: 1.0.0
+;; Version: 1.0.1
 ;; Package-Requires: ((emacs "25.1") (org "9.1"))
 
 ;; This file is not part of GNU Emacs.
@@ -100,15 +100,19 @@ Returns the comint buffer associated with the SESSION name."
   (when session
     (let* ((session-name (if (stringp session) session "default"))
            (buffer-name (format "*janet-repl-%s*" session-name))
-           (buffer (assoc-default session-name org-babel-janet-buffers)))
-      (if (and buffer (buffer-live-p buffer))
-          buffer
+           ;; Use standard `assoc` to find the pair (SESSION-NAME . BUFFER)
+           (pair (assoc session-name org-babel-janet-buffers)))
+      (if (and pair (buffer-live-p (cdr pair)))
+          (cdr pair) ; Return the existing live buffer
         (let ((new-buffer (make-comint buffer-name "janet" nil "-r")))
           (with-current-buffer new-buffer
             ;; Janet's REPL prompt is ">> ".
             (setq-local comint-prompt-regexp "^>> ")
             (comint-mode))
-          (setf (assoc-default session-name org-babel-janet-buffers) new-buffer)
+          ;; Update or add the session to the alist.
+          (if pair
+              (setcdr pair new-buffer) ; Update existing pair with new buffer
+            (push (cons session-name new-buffer) org-babel-janet-buffers)) ; Add new pair
           new-buffer)))))
 
 (defun org-babel-execute:janet (body params)
