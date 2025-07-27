@@ -4,7 +4,7 @@
 ;; Author: Your Name <your.email@example.com>
 ;; Keywords: org, babel, literate programming, janet
 ;; URL: https://github.com/YOUR_USERNAME/ob-janet
-;; Version: 1.0.3
+;; Version: 1.0.4
 ;; Package-Requires: ((emacs "25.1") (org "9.1"))
 
 ;; This file is not part of GNU Emacs.
@@ -48,6 +48,7 @@
 ;;; Code:
 
 (require 'ob)
+(require 'ob-core) ; Explicitly require ob-core for compiler warnings
 (require 'ob-comint)
 
 (defvar org-babel-janet-buffers '()
